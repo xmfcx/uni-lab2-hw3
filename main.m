@@ -81,9 +81,72 @@ end
 
 
 
+figure(1);
 plot(N_x, F_c(1,:), 'r-.',N_x, F_c(2,:), 'b:',N_x, F_c(3,:), 'k-',N_x, F_c(4,:), 'm--', 'LineWidth',2);
 legend('Alluminium Alloys', 'Magnesium Alloys', 'Stainless Steel', 'Titanium Alloys')
 xlabel('N [rev/min]')
 ylabel('F_c [N]')
 axis([200 500 0 1400])
 grid on
+
+
+N = 400; % [rev/min] rotational speed of workpiece
+Do = 12.5; % [mm] original diameter
+Df = 12: - 0.02:10; % [mm] machined diameter
+v = 150:250; % [mm/min]
+
+%disp(size(Df));
+%disp(size(v));
+
+f = v ./ N; % [mm/rev]
+d = (Do - Df) ./ 2; % [mm]
+D_avg = (Do + Df) ./ 2; % [mm]
+size_Df = size(Df, 2);
+size_v = size(v, 2);
+
+Spec_energy = 4;
+mrr = zeros(size_Df, size_v);
+Fc = zeros(size_Df, size_v);
+
+for i = 1:1:size_Df
+    for j = 1:1:size_v
+        mrr(i, j) = pi * D_avg(i) * d(i) * v(j);
+        Fc(i, j) = pi * D_avg(i) * d(i) * v(j) * Spec_energy / (2 * pi * N) * 1000 / (((Do + Df(i)) / 2) / 2);
+    end
+end
+
+figure(2);
+subplot(2, 2, 1); 
+mesh(v, Df, mrr); 
+xlabel('$$ \nu $$[mm/min]', 'Interpreter', 'latex'); 
+ylabel('D_f[mm]'); 
+zlabel('MRR[mm^3/min]');
+grid on; 
+
+subplot(2, 2, 2); 
+mesh(v, Df, Fc);
+xlabel('$$ \nu $$[mm/min]', 'Interpreter', 'latex'); 
+ylabel('D_f[mm]'); 
+zlabel('F_c[N]');
+grid on; 
+
+subplot(2, 2, 3); 
+plot(v, mrr(1, :), 'r--');
+axis([150 250 1000 2500]); 
+xlabel('$$ \nu $$[mm/min]', 'Interpreter', 'latex');
+ylabel('MRR[mm^3/min]');
+legend('D_f=12[mm]','Location','northwest');
+grid on; 
+
+subplot(2, 2, 4);
+plot(v, Fc(1, :), 'k-.');
+axis([150 250 300 700]);
+xlabel('$$ \nu $$[mm/min]', 'Interpreter', 'latex'); 
+ylabel('F_c[N]');
+legend('D_f=12[mm]','Location','northwest');
+grid on; 
+
+
+
+
+
